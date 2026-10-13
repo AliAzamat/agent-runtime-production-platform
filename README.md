@@ -108,14 +108,3 @@ app/
 ├── db/postgres.py    psycopg connection pool
 └── models/schema.sql tenants · runs · run_steps · run_events
 ```
-
-## Status and limitations
-
-The runtime mechanics work end to end; the agent itself is stubbed.
-
-- **Step handlers return fixed outputs and costs** (`retrieve` $0.002, `draft` $0.05, `cite_check` $0.01) rather than calling a retriever or LLM.
-- **No application entrypoint, dependency file, or tests yet** — see the quick start for the minimal wiring.
-- **Duplicate submits currently return a 500.** The idempotent path returns the existing run's ID as a `UUID` object, which `JSONResponse` can't serialize; it needs a `str()` conversion.
-- **Cancellation is half-wired.** The API sets `cancel_requested`, but the executor doesn't yet call `check_cancelled()` between steps, so a running run completes anyway.
-- **Failed runs aren't marked.** If a step exhausts its retries or raises `TerminalError`, the exception is swallowed by the pool's `gather(..., return_exceptions=True)` and the run stays `running` until its lease expires and it is reclaimed.
-- **The drain window isn't enforced in code.** `DRAIN_TIMEOUT_SECONDS = 60` is documented, but the worker waits for in-flight runs without a timeout and relies on the orchestrator's grace period.
