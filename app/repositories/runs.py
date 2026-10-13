@@ -31,7 +31,7 @@ class RunRepo:
                 "SELECT id FROM runs WHERE tenant_id=%s AND idempotency_key=%s",
                 (tenant_id, idempotency_key),
             )
-            return cur.fetchone()["id"], False
+            return str(cur.fetchone()["id"]), False
 
     def get(self, run_id: str) -> Optional[dict[str, Any]]:
         with cursor() as cur:
